@@ -86,28 +86,42 @@
 					</archive>
 				</configuration>
 			</plugin>
-			<plugin>
-				<artifactId>maven-resources-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>copy-resources</id>
-						<phase>validate</phase>
-						<goals>
-							<goal>copy-resources</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>${basedir}/target/extra-resources</outputDirectory>
-							<resources>
-								<resource>
-									<directory>src/non-packaged-resources</directory>
-									<filtering>true</filtering>
-								</resource>
-							</resources>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
 		</plugins>
+		<pluginManagement>
+			<plugins>
+				<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+				<plugin>
+					<groupId>org.eclipse.m2e</groupId>
+					<artifactId>lifecycle-mapping</artifactId>
+					<version>1.0.0</version>
+					<configuration>
+						<lifecycleMappingMetadata>
+							<pluginExecutions>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>com.vaadin</groupId>
+										<artifactId>
+											vaadin-maven-plugin
+										</artifactId>
+										<versionRange>
+											[7.0.5,)
+										</versionRange>
+										<goals>
+											<goal>resources</goal>
+											<goal>update-widgetset</goal>
+											<goal>compile</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore></ignore>
+									</action>
+								</pluginExecution>
+							</pluginExecutions>
+						</lifecycleMappingMetadata>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 	</build>
 	<profiles>
 		<profile>
@@ -141,22 +155,10 @@
 							</execution>
 						</executions>
 					</plugin>
+					<!-- Compile custom GWT components or widget dependencies with the GWT compiler -->
 					<plugin>
 						<groupId>com.vaadin</groupId>
 						<artifactId>vaadin-maven-plugin</artifactId>
-						<executions>
-							<execution>
-								<phase>generate-resources</phase>
-								<goals>
-									<goal>update-widgetset</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-					<!-- Compile custom GWT components or widget dependencies with the GWT compiler -->
-					<plugin>
-						<groupId>org.codehaus.mojo</groupId>
-						<artifactId>gwt-maven-plugin</artifactId>
 						<configuration>
 							<webappDirectory>${basedir}/src/main/webapp/VAADIN/widgetsets/</webappDirectory>
 							<extraJvmArgs>-Xmx512M -Xss1024k</extraJvmArgs>
@@ -165,22 +167,11 @@
 							<execution>
 								<goals>
 									<goal>resources</goal>
+									<goal>update-widgetset</goal>
 									<goal>compile</goal>
 								</goals>
 							</execution>
 						</executions>
-						<dependencies>
-							<dependency>
-								<groupId>com.google.gwt</groupId>
-								<artifactId>gwt-dev</artifactId>
-								<version>${gwt.version}</version>
-							</dependency>
-							<dependency>
-								<groupId>com.google.gwt</groupId>
-								<artifactId>gwt-user</artifactId>
-								<version>${gwt.version}</version>
-							</dependency>
-						</dependencies>
 					</plugin>
 				</plugins>
 			</build>
@@ -190,8 +181,20 @@
 		<!-- Vaadin dependencies -->
 		<dependency>
 			<groupId>com.vaadin</groupId>
-			<artifactId>vaadin</artifactId>
+			<artifactId>vaadin-server</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.vaadin</groupId>
+			<artifactId>vaadin-client-compiled</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.vaadin</groupId>
+			<artifactId>vaadin-client</artifactId>
 			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.vaadin</groupId>
+			<artifactId>vaadin-themes</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>javax.servlet</groupId>
@@ -223,23 +226,6 @@
 			<groupId>org.bull.examples.vaadin-osgi</groupId>
 			<artifactId>vaadin-model</artifactId>
 			<version>1.0.0-SNAPSHOT</version>
-			<scope>provided</scope>
-		</dependency>
-		<!-- GWT dependencies -->
-		<dependency>
-			<groupId>com.google.gwt</groupId>
-			<artifactId>gwt-user</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>javax.validation</groupId>
-			<artifactId>validation-api</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>javax.validation</groupId>
-			<artifactId>validation-api</artifactId>
-			<classifier>sources</classifier>
 			<scope>provided</scope>
 		</dependency>
 	</dependencies>

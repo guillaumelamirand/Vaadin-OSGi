@@ -21,35 +21,31 @@ package org.bull.examples.vaadin.osgi.portal;
 
 import java.util.Iterator;
 
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+
 import org.bull.examples.vaadin.osgi.model.PortalModule;
 import org.bull.examples.vaadin.osgi.model.PortalModuleListener;
 import org.bull.examples.vaadin.osgi.model.PortalModuleService;
 
 import com.google.common.eventbus.EventBus;
-import com.vaadin.Application;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.event.ItemClickEvent.ItemClickListener;
-import com.vaadin.terminal.Sizeable;
+import com.vaadin.server.VaadinRequest;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.HorizontalSplitPanel;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.TabSheet.Tab;
 import com.vaadin.ui.Tree;
-import com.vaadin.ui.Window;
+import com.vaadin.ui.UI;
 
-public class PortalOSGiApplication extends Application implements
+public class PortalOSGiApplication extends UI implements
 		PortalModuleListener {
 
 	/**
 	 * Default serial version id
 	 */
 	private static final long serialVersionUID = -2881139985491701737L;
-
-	private PortalModuleService portalModuleService;
-
-	public PortalOSGiApplication(final PortalModuleService pPortalModuleService) {
-		portalModuleService = pPortalModuleService;
-	}
 
 	private TabSheet tabs;
 
@@ -58,22 +54,22 @@ public class PortalOSGiApplication extends Application implements
 	private EventBus eventBus = new EventBus();
 
 	@Override
-	public void init() {
+	public void init(VaadinRequest request) {
 		HorizontalSplitPanel split = new HorizontalSplitPanel();
 		split.setSizeFull();
-		split.setSplitPosition(250, Sizeable.UNITS_PIXELS);
+		split.setSplitPosition(250, Unit.PIXELS);
 		tree = new Tree();
-		for (PortalModule module : portalModuleService.getModules()) {
+		for (PortalModule module : getPortalModuleService().getModules()) {
 			tree.addItem(module.getId());
 			tree.setItemCaption(module.getId(), module.getName());
 		}
-		tree.addListener(new ItemClickListener() {
+		tree.addItemClickListener(new ItemClickListener() {
 
 			@Override
 			public void itemClick(ItemClickEvent event) {
-				PortalModule module = portalModuleService
+				PortalModule module = getPortalModuleService()
 						.getModule((String) event.getItemId());
-				Iterator<Component> it = tabs.getComponentIterator();
+				Iterator<Component> it = tabs.iterator();
 				Component found = null;
 				while (it.hasNext()) {
 					Component c = it.next();
@@ -95,13 +91,13 @@ public class PortalOSGiApplication extends Application implements
 		tabs.setSizeFull();
 		split.setFirstComponent(tree);
 		split.setSecondComponent(tabs);
-		setMainWindow(new Window("Module Demo Application", split));
-		portalModuleService.addListener(this);
+		setContent(split);
+		getPortalModuleService().addListener(this);
 	}
 
 	@Override
 	public void close() {
-		portalModuleService.removeListener(this);
+		getPortalModuleService().removeListener(this);
 		super.close();
 	}
 
@@ -114,7 +110,7 @@ public class PortalOSGiApplication extends Application implements
 	@Override
 	public void moduleUnregistered(PortalModule module) {
 		tree.removeItem(module.getId());
-		Iterator<Component> it = tabs.getComponentIterator();
+		Iterator<Component> it = tabs.iterator();
 		while (it.hasNext()) {
 			Component c = it.next();
 			if (tabs.getTab(c).getCaption().equals(module.getName())) {
@@ -122,6 +118,43 @@ public class PortalOSGiApplication extends Application implements
 				return;
 			}
 		}
+	}
+
+	/**
+	 * This method allows to obtain a {@link PortalModuleService} service
+	 * implementation available in the OSGi context.
+	 * 
+	 * @return implementation of the {@link PortalModuleService} service found
+	 */
+	public static PortalModuleService getPortalModuleService() {
+		return getService(PortalModuleService.class);
+	}
+
+	/**
+	 * This method allows to obtain a service implementation available in the
+	 * OSGi context.
+	 * 
+	 * @param pClassService
+	 *            represents the instance of the service you are looking for @
+	 * @param <T>
+	 *            represents the class of the service
+	 * @return implementation of the service
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> T getService(final Class<T> pClassService) {
+		String canonicalName = pClassService.getCanonicalName();
+		T service = null;
+		try {
+			InitialContext initialContext = new InitialContext();
+			service = (T) initialContext.lookup(String.format(
+					"osgi:service/%s", canonicalName));
+
+		} catch (NamingException e) {
+			throw new IllegalArgumentException(String.format(
+					"Unable to get OSGi service with [interface=%s]",
+					canonicalName));
+		}
+		return service;
 	}
 
 }

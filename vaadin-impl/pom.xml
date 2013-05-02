@@ -14,7 +14,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>com.vaadin</groupId>
-			<artifactId>vaadin</artifactId>
+			<artifactId>vaadin-server</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.bull.examples.vaadin-osgi</groupId>
