@@ -20,69 +20,116 @@
 package org.bull.examples.vaadin.osgi.portal;
 
 import java.util.Iterator;
+import java.util.Locale;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
+import org.bull.examples.vaadin.osgi.event.LocaleChangedEvent;
 import org.bull.examples.vaadin.osgi.model.PortalModule;
 import org.bull.examples.vaadin.osgi.model.PortalModuleListener;
 import org.bull.examples.vaadin.osgi.model.PortalModuleService;
 
 import com.google.common.eventbus.EventBus;
+import com.vaadin.annotations.Theme;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.event.ItemClickEvent.ItemClickListener;
 import com.vaadin.server.VaadinRequest;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.Button.ClickEvent;
+import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.Component;
+import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.HorizontalSplitPanel;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.TabSheet.Tab;
 import com.vaadin.ui.Tree;
 import com.vaadin.ui.UI;
+import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.themes.Reindeer;
 
-public class PortalOSGiApplication extends UI implements
-		PortalModuleListener {
+@Theme("reindeer")
+public class PortalOSGiApplication extends UI implements PortalModuleListener
+{
 
 	/**
 	 * Default serial version id
 	 */
 	private static final long serialVersionUID = -2881139985491701737L;
 
-	private TabSheet tabs;
+	private TabSheet					tabs;
 
-	private Tree tree;
-	
-	private EventBus eventBus = new EventBus();
+	private Tree							tree;
+
+	private final EventBus		eventBus				 = new EventBus();
 
 	@Override
-	public void init(VaadinRequest request) {
+	public void init(VaadinRequest request)
+	{
+		VerticalLayout layout = new VerticalLayout();
+		layout.setSizeFull();
+		HorizontalLayout i18n = new HorizontalLayout();
+		i18n.setHeight("25px");
+		Button fr = new Button("FR");
+		fr.setStyleName(Reindeer.BUTTON_SMALL);
+		fr.addClickListener(new ClickListener()
+		{
+
+			@Override
+			public void buttonClick(ClickEvent pEvent)
+			{
+				eventBus.post(new LocaleChangedEvent(Locale.FRANCE));
+
+			}
+		});
+		Button en = new Button("EN");
+		en.setStyleName(Reindeer.BUTTON_SMALL);
+		en.addClickListener(new ClickListener()
+		{
+
+			@Override
+			public void buttonClick(ClickEvent pEvent)
+			{
+				eventBus.post(new LocaleChangedEvent(Locale.US));
+
+			}
+		});
+		i18n.addComponent(fr);
+		i18n.addComponent(en);
 		HorizontalSplitPanel split = new HorizontalSplitPanel();
 		split.setSizeFull();
 		split.setSplitPosition(250, Unit.PIXELS);
 		tree = new Tree();
-		for (PortalModule module : getPortalModuleService().getModules()) {
+		for (PortalModule module : getPortalModuleService().getModules())
+		{
 			tree.addItem(module.getId());
 			tree.setItemCaption(module.getId(), module.getName());
 		}
-		tree.addItemClickListener(new ItemClickListener() {
+		tree.addItemClickListener(new ItemClickListener()
+		{
 
 			@Override
-			public void itemClick(ItemClickEvent event) {
-				PortalModule module = getPortalModuleService()
-						.getModule((String) event.getItemId());
+			public void itemClick(ItemClickEvent event)
+			{
+				PortalModule module = getPortalModuleService().getModule((String) event.getItemId());
 				Iterator<Component> it = tabs.iterator();
 				Component found = null;
-				while (it.hasNext()) {
+				while (it.hasNext())
+				{
 					Component c = it.next();
-					if (tabs.getTab(c).getCaption().equals(module.getName())) {
+					if (tabs.getTab(c).getCaption().equals(module.getName()))
+					{
 						found = c;
 						break;
 					}
 				}
-				if (found == null) {
-					Tab addTab = tabs.addTab(module.createComponent(eventBus),
-							module.getName());
+				if (found == null)
+				{
+					Tab addTab = tabs.addTab(module.createComponent(eventBus), module.getName());
 					addTab.setClosable(true);
-				} else {
+				}
+				else
+				{
 					tabs.setSelectedTab(found);
 				}
 			}
@@ -91,29 +138,38 @@ public class PortalOSGiApplication extends UI implements
 		tabs.setSizeFull();
 		split.setFirstComponent(tree);
 		split.setSecondComponent(tabs);
-		setContent(split);
+		layout.addComponent(i18n);
+		layout.addComponent(split);
+		layout.setExpandRatio(i18n, 0.1f);
+		layout.setExpandRatio(split, 0.9f);
+		setContent(layout);
 		getPortalModuleService().addListener(this);
 	}
 
 	@Override
-	public void close() {
+	public void close()
+	{
 		getPortalModuleService().removeListener(this);
 		super.close();
 	}
 
 	@Override
-	public void moduleRegistered(PortalModule module) {
+	public void moduleRegistered(PortalModule module)
+	{
 		tree.addItem(module.getId());
 		tree.setItemCaption(module.getId(), module.getName());
 	}
 
 	@Override
-	public void moduleUnregistered(PortalModule module) {
+	public void moduleUnregistered(PortalModule module)
+	{
 		tree.removeItem(module.getId());
 		Iterator<Component> it = tabs.iterator();
-		while (it.hasNext()) {
+		while (it.hasNext())
+		{
 			Component c = it.next();
-			if (tabs.getTab(c).getCaption().equals(module.getName())) {
+			if (tabs.getTab(c).getCaption().equals(module.getName()))
+			{
 				tabs.removeComponent(c);
 				return;
 			}
@@ -126,7 +182,8 @@ public class PortalOSGiApplication extends UI implements
 	 * 
 	 * @return implementation of the {@link PortalModuleService} service found
 	 */
-	public static PortalModuleService getPortalModuleService() {
+	public static PortalModuleService getPortalModuleService()
+	{
 		return getService(PortalModuleService.class);
 	}
 
@@ -135,23 +192,25 @@ public class PortalOSGiApplication extends UI implements
 	 * OSGi context.
 	 * 
 	 * @param pClassService
-	 *            represents the instance of the service you are looking for @
+	 *          represents the instance of the service you are looking for @
 	 * @param <T>
-	 *            represents the class of the service
+	 *          represents the class of the service
 	 * @return implementation of the service
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T> T getService(final Class<T> pClassService) {
+	public static <T> T getService(final Class<T> pClassService)
+	{
 		String canonicalName = pClassService.getCanonicalName();
 		T service = null;
-		try {
+		try
+		{
 			InitialContext initialContext = new InitialContext();
-			service = (T) initialContext.lookup(String.format(
-					"osgi:service/%s", canonicalName));
+			service = (T) initialContext.lookup(String.format("osgi:service/%s", canonicalName));
 
-		} catch (NamingException e) {
-			throw new IllegalArgumentException(String.format(
-					"Unable to get OSGi service with [interface=%s]",
+		}
+		catch (NamingException e)
+		{
+			throw new IllegalArgumentException(String.format("Unable to get OSGi service with [interface=%s]",
 					canonicalName));
 		}
 		return service;

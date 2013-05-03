@@ -1,23 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
- * NovaForge(TM) is a web-based forge offering a Collaborative Development and 
- * Project Management Environment.
- *
- * Copyright (C) 2007-2012  BULL SAS
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see http://www.gnu.org/licenses/.
--->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
@@ -42,11 +23,26 @@
 					</supportedProjectTypes>
 					<instructions>
 						<Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+
+						<Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
 						<Bundle-ClassPath>.,WEB-INF/classes</Bundle-ClassPath>
 						    
 						<!-- Add Embed lib -->
+						<Embed-Transitive>true</Embed-Transitive>
 						<Embed-Directory>WEB-INF/lib</Embed-Directory>
 						<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
+						<!-- Import Packages -->
+						<Import-Package>!com.google.appengine.*,
+										!com.google.apphosting.*,
+										!com.google.gwt.*,
+										!com.google.web.bindery.*,
+										!com.liferay.*,
+										!javax.portlet.*,
+										!javax.sql,
+										!org.carrot2.*,
+										!sun.misc.*,
+										*
+						</Import-Package>
 					    
 						<!-- Package format version - do not change -->
 						<Vaadin-Package-Version>${project.version}</Vaadin-Package-Version>
@@ -182,6 +178,7 @@
 		<dependency>
 			<groupId>com.vaadin</groupId>
 			<artifactId>vaadin-server</artifactId>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.vaadin</groupId>

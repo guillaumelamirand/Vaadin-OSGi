@@ -28,16 +28,21 @@
 		<param-value>false</param-value>
 	</context-param>
 	<servlet>
-        <servlet-name>Portal Vaadin App</servlet-name>
-        <servlet-class>com.vaadin.server.VaadinServlet</servlet-class>
-        <init-param>
-            <description>Vaadin UI</description>
-            <param-name>UI</param-name>
-            <param-value>org.bull.examples.vaadin.osgi.portal.PortalOSGiApplication</param-value>
-        </init-param>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>Portal Vaadin App</servlet-name>
-        <url-pattern>/*</url-pattern>
-    </servlet-mapping>
+		<servlet-name>Portal Vaadin App</servlet-name>
+		<servlet-class>com.vaadin.server.VaadinServlet</servlet-class>
+		<init-param>
+			<description>Vaadin UI</description>
+			<param-name>UI</param-name>
+			<param-value>org.bull.examples.vaadin.osgi.portal.PortalOSGiApplication</param-value>
+		</init-param>
+		<init-param>
+			<description>Widget Set to Use</description>
+			<param-name>widgetset</param-name>
+			<param-value>org.bull.examples.vaadin.osgi.portal.widgetset.PortalWidgetset</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>Portal Vaadin App</servlet-name>
+		<url-pattern>/*</url-pattern>
+	</servlet-mapping>
 </web-app>
