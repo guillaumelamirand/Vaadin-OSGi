@@ -31,18 +31,11 @@
 						<Embed-Transitive>true</Embed-Transitive>
 						<Embed-Directory>WEB-INF/lib</Embed-Directory>
 						<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
-						<!-- Import Packages -->
-						<Import-Package>!com.google.appengine.*,
-										!com.google.apphosting.*,
-										!com.google.gwt.*,
-										!com.google.web.bindery.*,
-										!com.liferay.*,
-										!javax.portlet.*,
-										!javax.sql,
-										!org.carrot2.*,
-										!sun.misc.*,
-										*
-						</Import-Package>
+						
+						<!-- VAADIN Require -->
+						<Import-Package>VAADIN;version=${vaadin.version},*</Import-Package>
+						<Require-Bundle>com.vaadin.client-compiled;bundle-version="${vaadin.version}",
+										com.vaadin.themes;bundle-version="${vaadin.version}"</Require-Bundle>
 					    
 						<!-- Package format version - do not change -->
 						<Vaadin-Package-Version>${project.version}</Vaadin-Package-Version>
@@ -183,6 +176,7 @@
 		<dependency>
 			<groupId>com.vaadin</groupId>
 			<artifactId>vaadin-client-compiled</artifactId>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.vaadin</groupId>
@@ -192,6 +186,7 @@
 		<dependency>
 			<groupId>com.vaadin</groupId>
 			<artifactId>vaadin-themes</artifactId>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>javax.servlet</groupId>

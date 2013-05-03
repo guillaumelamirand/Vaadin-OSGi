@@ -29,7 +29,7 @@
 	</context-param>
 	<servlet>
 		<servlet-name>Portal Vaadin App</servlet-name>
-		<servlet-class>com.vaadin.server.VaadinServlet</servlet-class>
+		<servlet-class>org.bull.examples.vaadin.osgi.portal.servlet.OSGiServlet</servlet-class>
 		<init-param>
 			<description>Vaadin UI</description>
 			<param-name>UI</param-name>
